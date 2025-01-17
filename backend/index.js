@@ -2,26 +2,17 @@ import express from 'express';
 import cors from 'cors';
 import { OpenAI } from 'openai';
 import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import path from 'path';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Load environment variables
-const envPath = path.resolve(__dirname, '../../.env');
-console.log('Loading .env file from:', envPath);
-const result = dotenv.config({ path: envPath });
-
-if (result.error) {
-  console.error('Error loading .env file:', result.error);
-  process.exit(1);
+// .env 파일 로딩 시도 (실패해도 계속 진행)
+try {
+  dotenv.config();
+} catch (error) {
+  console.log('No .env file found');
 }
 
 const app = express();
 
-// CORS 설정 수정
+// CORS 설정
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
     ? 'https://your-frontend-url.onrender.com' 
@@ -38,7 +29,11 @@ const openai = new OpenAI({
 
 // 서버 상태 확인용 엔드포인트
 app.get('/', (req, res) => {
-  res.json({ status: 'Server is running' });
+  res.json({ 
+    status: 'Server is running',
+    environment: process.env.NODE_ENV,
+    apiKeyExists: !!process.env.OPENAI_API_KEY
+  });
 });
 
 app.post('/api/analyze', async (req, res) => {
