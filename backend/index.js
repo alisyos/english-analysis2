@@ -12,10 +12,10 @@ try {
 
 const app = express();
 
-// CORS 설정
+// CORS 설정 업데이트
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
-    ? 'https://your-frontend-url.onrender.com' 
+    ? 'https://english-analysis-web.onrender.com' 
     : 'http://localhost:3000',
   optionsSuccessStatus: 200
 };
