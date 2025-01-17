@@ -12,15 +12,21 @@ try {
 
 const app = express();
 
-// CORS 설정 업데이트
+// CORS 설정 상세화
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? 'https://english-analysis-web.onrender.com' 
-    : 'http://localhost:3000',
+  origin: ['https://english-analysis-web.onrender.com', 'http://localhost:3000'],
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
   optionsSuccessStatus: 200
 };
 
+// CORS 미들웨어 적용
 app.use(cors(corsOptions));
+
+// preflight 요청을 위한 OPTIONS 처리
+app.options('*', cors(corsOptions));
+
 app.use(express.json());
 
 const openai = new OpenAI({
@@ -37,6 +43,11 @@ app.get('/', (req, res) => {
 });
 
 app.post('/api/analyze', async (req, res) => {
+  // CORS 헤더 명시적 설정
+  res.header('Access-Control-Allow-Origin', 'https://english-analysis-web.onrender.com');
+  res.header('Access-Control-Allow-Methods', 'GET, POST');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
   try {
     const { text } = req.body;
     console.log('\n=== 새로운 분석 요청 ===');
