@@ -176,7 +176,7 @@ const defaultPrompt = `다음은 사용자가 입력한 영어 문단입니다. 
 ]`;
 
 const API_URL = process.env.NODE_ENV === 'production'
-  ? 'https://english-analysis-backend.onrender.com'
+  ? 'https://english-analysis.onrender.com'
   : 'http://localhost:3001';
 
 function GrammarAnalysis() {
