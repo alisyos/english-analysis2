@@ -12,20 +12,12 @@ try {
 
 const app = express();
 
-// CORS 설정 상세화
-const corsOptions = {
-  origin: ['https://english-analysis-web.onrender.com', 'http://localhost:3000'],
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  optionsSuccessStatus: 200
-};
-
-// CORS 미들웨어 적용
-app.use(cors(corsOptions));
-
-// preflight 요청을 위한 OPTIONS 처리
-app.options('*', cors(corsOptions));
+// 모든 요청 허용으로 CORS 설정 단순화
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type']
+}));
 
 app.use(express.json());
 
