@@ -37,20 +37,14 @@ app.get('/', (req, res) => {
 
 app.post('/api/analyze', async (req, res) => {
   try {
-    const { text, prompt } = req.body;  // 클라이언트에서 받은 프롬프트 사용
-    console.log('\n=== 새로운 분석 요청 ===');
-    console.log('입력된 텍스트:', text);
-    console.log('사용된 프롬프트:', prompt);
-    console.log('------------------------');
-
+    const { text, prompt } = req.body;
+    
     if (!text) {
-      console.log('텍스트가 없음');
       return res.status(400).json({ error: 'Text is required' });
     }
 
-    console.log('GPT에 요청 중...');
     const completion = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
