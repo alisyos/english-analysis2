@@ -265,7 +265,7 @@ function GrammarAnalysis() {
       
       <PromptSection>
         <PromptToggleButton onClick={() => setShowPrompt(!showPrompt)}>
-          {showPrompt ? '프롬프트 숨기기' : '프롬프트 편집하기'}
+          {showPrompt ? '프롬프트 숨기기' : '프롬프트 보기'}
         </PromptToggleButton>
         
         {showPrompt && (
@@ -301,24 +301,19 @@ function GrammarAnalysis() {
           <LoadingSpinner>분석 중입니다...</LoadingSpinner>
         )}
         
-        {analysis.map((item, index) => (
+        {analysis && analysis.length > 0 && analysis.map((item, index) => (
           <AnalysisCard key={index}>
-            <SentenceText>
-              <strong>영문:</strong> {item.Sentence}
-            </SentenceText>
-            <TranslationText>
-              <strong>번역:</strong> {item.translation}
-            </TranslationText>
-            <ExplanationList>
-              {item.explanation.map((exp, i) => (
-                <ExplanationItem 
-                  key={i} 
-                  number={`${String.fromCharCode(9312 + i)}`}
-                >
-                  {exp}
-                </ExplanationItem>
-              ))}
-            </ExplanationList>
+            <SentenceText>{item.Sentence}</SentenceText>
+            <TranslationText>{item.translation}</TranslationText>
+            {item.explanation && Array.isArray(item.explanation) && (
+              <ExplanationList>
+                {item.explanation.map((exp, expIndex) => (
+                  <ExplanationItem key={expIndex}>
+                    {exp}
+                  </ExplanationItem>
+                ))}
+              </ExplanationList>
+            )}
           </AnalysisCard>
         ))}
       </ResultsSection>
