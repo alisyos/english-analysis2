@@ -63,63 +63,43 @@ const Button = styled.button`
 `;
 
 const ResultsSection = styled.div`
-  margin-top: 2rem;
-  text-align: left;
+  margin-top: 20px;
 `;
 
 const AnalysisCard = styled.div`
   background: white;
-  border: 1px solid #e0e0e0;
   border-radius: 8px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  text-align: left;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const SentenceText = styled.p`
-  font-size: 18px;
+  font-size: 1.1em;
+  margin-bottom: 10px;
   color: #2c3e50;
-  margin-bottom: 1rem;
-  line-height: 1.5;
-  text-align: left;
 `;
 
 const TranslationText = styled.p`
-  font-size: 16px;
+  font-size: 1em;
+  margin-bottom: 15px;
   color: #34495e;
-  margin-bottom: 1rem;
-  padding-left: 1rem;
   border-left: 3px solid #3498db;
-  text-align: left;
+  padding-left: 10px;
 `;
 
-const ExplanationList = styled.ul`
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
+const ExplanationList = styled.ol`
+  margin-left: 20px;
+  padding-left: 0;
 `;
 
 const ExplanationItem = styled.li`
-  font-size: 15px;
+  margin-bottom: 8px;
+  line-height: 1.5;
   color: #555;
-  margin-bottom: 0.5rem;
-  padding: 0.5rem;
-  background-color: #f8f9fa;
-  border-radius: 4px;
-  position: relative;
-  padding-left: 2rem;
-  
-  &:before {
-    content: '${props => `${props.number}`}';
-    position: absolute;
-    left: 0.5rem;
-    font-weight: bold;
+  &::marker {
     color: #3498db;
-  }
-  
-  &:last-child {
-    margin-bottom: 0;
+    font-weight: bold;
   }
 `;
 
@@ -325,11 +305,11 @@ function GrammarAnalysis() {
           <AnalysisCard key={index}>
             <SentenceText>{item.Sentence}</SentenceText>
             <TranslationText>{item.translation}</TranslationText>
-            {item.explanation && Array.isArray(item.explanation) && (
+            {item.explanation && (
               <ExplanationList>
                 {item.explanation.map((exp, expIndex) => (
                   <ExplanationItem key={expIndex}>
-                    {exp}
+                    {exp.replace(/^[①-⑩\d\.\s]+/, '')}
                   </ExplanationItem>
                 ))}
               </ExplanationList>
