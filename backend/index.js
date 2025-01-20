@@ -3,7 +3,6 @@ import cors from 'cors';
 import { OpenAI } from 'openai';
 import dotenv from 'dotenv';
 
-// .env 파일 로딩 시도 (실패해도 계속 진행)
 try {
   dotenv.config();
 } catch (error) {
@@ -12,17 +11,20 @@ try {
 
 const app = express();
 
-// 모든 도메인에서의 요청 허용
-app.use(cors());
+// CORS 설정
+const corsOptions = {
+  origin: '*',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type']
+};
 
-// JSON 파싱 미들웨어
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// 서버 상태 확인용 엔드포인트
 app.get('/', (req, res) => {
   res.json({ 
     status: 'Server is running',
@@ -55,23 +57,18 @@ app.post('/api/analyze', async (req, res) => {
     });
 
     const response = completion.choices[0].message.content;
-    console.log('\n=== GPT 응답 ===');
-    console.log(response);
-
+    
     try {
       const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
       return res.json(Array.isArray(parsedResponse) ? parsedResponse : [parsedResponse]);
     } catch (parseError) {
-      console.error('응답 파싱 에러:', parseError);
       throw new Error('응답 파싱 실패: ' + parseError.message);
     }
   } catch (error) {
-    console.error('=== 에러 발생 ===');
-    console.error('에러 내용:', error);
+    console.error('분석 에러:', error);
     return res.status(500).json({
       error: '분석 중 오류가 발생했습니다.',
-      details: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      details: error.message
     });
   }
 });
