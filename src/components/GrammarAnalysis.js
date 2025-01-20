@@ -226,6 +226,9 @@ function GrammarAnalysis() {
     
     setIsLoading(true);
     try {
+      console.log('=== 현재 사용 중인 프롬프트 ===');
+      console.log(prompt);
+
       const response = await fetch(`${API_URL}/api/analyze`, {
         method: 'POST',
         headers: {
@@ -238,6 +241,9 @@ function GrammarAnalysis() {
       });
       
       const data = await response.json();
+      console.log('=== 서버 응답 데이터 ===');
+      console.log(data);
+      
       setAnalysis(data);
     } catch (error) {
       console.error('Error:', error);

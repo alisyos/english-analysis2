@@ -41,9 +41,11 @@ app.post('/api/analyze', async (req, res) => {
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   
   try {
-    const { text } = req.body;
+    const { text, prompt } = req.body;
     console.log('\n=== 새로운 분석 요청 ===');
     console.log('입력된 텍스트:', text);
+    console.log('사용된 프롬프트:', prompt);
+    console.log('------------------------');
 
     if (!text) {
       console.log('텍스트가 없음');
@@ -86,7 +88,8 @@ app.post('/api/analyze', async (req, res) => {
     });
 
     const response = completion.choices[0].message.content;
-    console.log('\nGPT 원본 응답:\n', response);
+    console.log('\n=== GPT 응답 ===');
+    console.log(response);
 
     try {
       let cleanResponse = response.replace(/```json\n|\n```/g, '');
