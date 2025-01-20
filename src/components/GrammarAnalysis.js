@@ -137,12 +137,25 @@ const PromptEditor = styled.textarea`
   }
 `;
 
-const defaultPrompt = `다음은 사용자가 입력한 영어 문단입니다. 문단을 분석하고, 학습자를 위한 구문 풀이와 번역을 포함한 결과물을 아래의 형식에 맞게 작성하세요.
-구문 풀이 시, **주요 문법 포인트(접속사, 시제, 수식어, 구문 구조 등)**와 함께, 잘못 이해할 가능성이 있는 표현이나 구조에 대한 설명을 추가하세요.
-결과물은 반드시 아래의 예시 형식을 따르며, 적절한 한글 번역을 포함하세요.
+const defaultPrompt = `###
 
+다음은 사용자가 입력한 영어 문단입니다. 문단을 분석하고, 학습자를 위한 구문 풀이와 번역을 포함한 결과물을 아래의 형식에 맞게 작성하세요.
+ 
+구문 풀이 시, **주요 문법 포인트(접속사, 시제, 수식어, 구문 구조 등)**와 함께, 잘못 이해할 가능성이 있는 표현이나 구조에 대한 설명을 추가하세요. 문장에서 사용된  주요 문법 포인트를 항목화하여 설명합니다.
+ 
+예시:
+① 이중소유격: '한정사+명사+of+소유대명사/독립소유격'의 형태로, 한정사(a)는 독립 소유격과 함께 쓰일 수 없습니다.
+cf) a his dad's friend (x), a friend of his dad's (o)
+② regret + 동명사: regret은 to부정사와 동명사를 목적어로 취할 수 있으나, '~한 것을 후회하다'는 의미일 때는 동명사를 사용합니다.
+cf) regret + to부정사: ~해서 유감이다
+✔ 동명사의 부정: 동명사 앞에 not을 붙입니다.
+ 
+주의 사항과 혼동하기 쉬운 예시를 포함합니다.
+목적격 관계대명사 생략, 대부정사(to) 등은 반드시 학습자가 이해할 수 있도록 명확히 설명합니다.
+ 
 [입력값]
-{사용자가 입력한 문단}
+{Her enthusiasm for ballet made her ④practice the moves hundreds, even thousands of times, until she ⑤perfected ⑥each one..}
+ 
 [결과물 형식]
 영문 문장: 문단에서 문장을 한 줄씩 분리하여 번호를 매기고, 각 문장을 표시합니다.
 한글 번역: 각 문장의 정확한 번역을 제공합니다.
@@ -150,16 +163,16 @@ const defaultPrompt = `다음은 사용자가 입력한 영어 문단입니다. 
 문장별 주요 문법 포인트를 항목화하여 설명합니다.
 복잡하거나 주의가 필요한 어휘, 구문, 문법 구조에 대한 추가 설명을 포함합니다.
 학습에 도움이 되는 관련 문제 유형(예: 어법, 구문 이해, 빈칸 문제 등)을 제안합니다.
-
+ 
 ###
 **구문풀이 예시**
 [전체구문]
 With only two minutes to play, both teams were fighting for the football. It was the last home game for the seniors of Winston High, and they were determined to win. Since it had been a close game the whole evening, the best players of each team hadn't left the field. Once Winston High's coach finally knew that victory was theirs, all the seniors on the sidelines were allowed to play for the last few seconds. One of the seniors, Ethan, was especially happy. He had never played in any of the games before. Now, Ethan was finally getting the chance to step onto the grass.
-
+ 
 [구문풀이]
 With only two minutes to play, both teams were fighting for the football. It was the last home game for the seniors of Winston High, and they were determined to win.
 경기 시간 단 2분을 남기고, 양 팀은 공을 차지하기 위해 싸우고 있었다. 이 경기는 윈스턴 고등학교 4학년 학생들의 마지막 홈 경기였고, 그들은 이기려는 의지가 확고했다.
-
+ 
 구문 풀이
 ① to부정사 용법: '경기할'의 뜻으로 명사 two minutes를 수식하는 형용사적 용법이다. 
 ② both+복수명사: '양 쪽의, 둘 다의'를 뜻하는 both는 복수명사 teams를 수식하며, 주어가 복수이므로 복수동사 were가 이어진다. 
