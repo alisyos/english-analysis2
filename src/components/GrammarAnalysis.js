@@ -202,7 +202,10 @@ With only two minutes to play, both teams were fighting for the football. It was
     "explanation": [
       "문법 포인트 1",
       "문법 포인트 2",
-      "문법 포인트 3"
+      "문법 포인트 3",
+      "문법 포인트 4",
+      "문법 포인트 5",
+      "... 필요한 만큼 추가 포인트"
     ]
   }
 ]`;
