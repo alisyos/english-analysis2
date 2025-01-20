@@ -40,7 +40,7 @@ app.post('/api/analyze', async (req, res) => {
     }
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4",
       messages: [
         {
           role: "system",
