@@ -88,19 +88,17 @@ const TranslationText = styled.p`
   padding-left: 10px;
 `;
 
-const ExplanationList = styled.ol`
+const ExplanationList = styled.div`
   margin-left: 20px;
   padding-left: 0;
 `;
 
-const ExplanationItem = styled.li`
+const ExplanationItem = styled.div`
   margin-bottom: 8px;
   line-height: 1.5;
   color: #555;
-  &::marker {
-    color: #3498db;
-    font-weight: bold;
-  }
+  position: relative;
+  padding-left: 25px;
 `;
 
 const LoadingSpinner = styled.div`
@@ -259,6 +257,12 @@ function GrammarAnalysis() {
     }
   };
 
+  // 원형 숫자 변환 함수 추가
+  const getCircledNumber = (num) => {
+    const circledNumbers = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩'];
+    return circledNumbers[num] || (num + 1).toString();
+  };
+
   return (
     <Container>
       <Title>영어문장 구문풀이</Title>
@@ -301,21 +305,29 @@ function GrammarAnalysis() {
           <LoadingSpinner>분석 중입니다...</LoadingSpinner>
         )}
         
-        {analysis && analysis.length > 0 && analysis.map((item, index) => (
-          <AnalysisCard key={index}>
-            <SentenceText>{item.Sentence}</SentenceText>
-            <TranslationText>{item.translation}</TranslationText>
-            {item.explanation && (
-              <ExplanationList>
-                {item.explanation.map((exp, expIndex) => (
-                  <ExplanationItem key={expIndex}>
-                    {exp.replace(/^[①-⑩\d\.\s]+/, '')}
-                  </ExplanationItem>
-                ))}
-              </ExplanationList>
-            )}
-          </AnalysisCard>
-        ))}
+        {analysis && analysis.length > 0 && (
+          <>
+            {analysis.map((item, index) => (
+              <AnalysisCard key={index}>
+                <SentenceText>
+                  {item.Sentence || '문장 없음'}
+                </SentenceText>
+                <TranslationText>
+                  {item.translation || '번역 없음'}
+                </TranslationText>
+                {Array.isArray(item.explanation) && (
+                  <ExplanationList>
+                    {item.explanation.map((exp, expIndex) => (
+                      <ExplanationItem key={expIndex}>
+                        {getCircledNumber(expIndex)} {exp.replace(/^[①-⑩\d\.\s]+/, '')}
+                      </ExplanationItem>
+                    ))}
+                  </ExplanationList>
+                )}
+              </AnalysisCard>
+            ))}
+          </>
+        )}
       </ResultsSection>
     </Container>
   );
