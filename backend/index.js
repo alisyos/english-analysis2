@@ -12,15 +12,20 @@ try {
 
 const app = express();
 
-// CORS 설정
+// CORS 설정 업데이트
 const corsOptions = {
-  origin: '*',
+  origin: ['https://english-analysis-web.onrender.com', 'http://localhost:3000'],
   methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type']
+  allowedHeaders: ['Content-Type'],
+  credentials: true,
+  optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));
 app.use(express.json());
+
+// 프리플라이트 요청을 위한 OPTIONS 핸들러 추가
+app.options('*', cors(corsOptions));
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
