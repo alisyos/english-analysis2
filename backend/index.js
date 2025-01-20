@@ -12,13 +12,14 @@ try {
 
 const app = express();
 
-// 모든 요청 허용으로 CORS 설정 단순화
-app.use(cors({
+// CORS 설정
+const corsOptions = {
   origin: '*',
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type']
-}));
+};
 
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const openai = new OpenAI({
@@ -35,13 +36,8 @@ app.get('/', (req, res) => {
 });
 
 app.post('/api/analyze', async (req, res) => {
-  // CORS 헤더 명시적 설정
-  res.header('Access-Control-Allow-Origin', 'https://english-analysis-web.onrender.com');
-  res.header('Access-Control-Allow-Methods', 'GET, POST');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  
   try {
-    const { text, prompt } = req.body;
+    const { text, prompt } = req.body;  // 클라이언트에서 받은 프롬프트 사용
     console.log('\n=== 새로운 분석 요청 ===');
     console.log('입력된 텍스트:', text);
     console.log('사용된 프롬프트:', prompt);
@@ -52,28 +48,9 @@ app.post('/api/analyze', async (req, res) => {
       return res.status(400).json({ error: 'Text is required' });
     }
 
-    const prompt = `다음은 사용자가 입력한 영어 문단입니다. 문단을 분석하고, 학습자를 위한 구문 풀이와 번역을 포함한 결과물을 아래의 형식에 맞게 작성하세요.
-    구문 풀이 시, 주요 문법 포인트(접속사, 시제, 수식어, 구문 구조 등)와 함께, 잘못 이해할 가능성이 있는 표현이나 구조에 대한 설명을 추가하세요.
-    
-    [입력값]
-    ${text}
-    
-    응답은 반드시 아래 JSON 형식을 따라주세요:
-    [
-      {
-        "Sentence": "영문 문장",
-        "translation": "한글 번역",
-        "explanation": [
-          "문법 포인트 1",
-          "문법 포인트 2",
-          "문법 포인트 3"
-        ]
-      }
-    ]`;
-
     console.log('GPT에 요청 중...');
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4",
       messages: [
         {
           role: "system",
@@ -81,7 +58,7 @@ app.post('/api/analyze', async (req, res) => {
         },
         {
           role: "user",
-          content: prompt
+          content: prompt + '\n\n[입력값]\n' + text
         }
       ],
       temperature: 0.7,
@@ -92,23 +69,14 @@ app.post('/api/analyze', async (req, res) => {
     console.log(response);
 
     try {
-      let cleanResponse = response.replace(/```json\n|\n```/g, '');
-      const startIndex = cleanResponse.indexOf('[');
-      if (startIndex !== -1) {
-        cleanResponse = cleanResponse.substring(startIndex);
-      }
-      console.log('\n정제된 응답:\n', cleanResponse);
-
-      const parsedResponse = JSON.parse(cleanResponse);
+      const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
       return res.json(Array.isArray(parsedResponse) ? parsedResponse : [parsedResponse]);
     } catch (parseError) {
       console.error('응답 파싱 에러:', parseError);
-      console.error('정제된 응답:', cleanResponse);
       throw new Error('응답 파싱 실패: ' + parseError.message);
     }
-
   } catch (error) {
-    console.error('\n=== 에러 발생 ===');
+    console.error('=== 에러 발생 ===');
     console.error('에러 내용:', error);
     return res.status(500).json({
       error: '분석 중 오류가 발생했습니다.',
