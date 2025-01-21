@@ -216,14 +216,11 @@ function GrammarAnalysis() {
     if (!text.trim()) return;
     
     setIsLoading(true);
-    setAnalysis(null); // 분석 시작 시 이전 결과 초기화
+    setAnalysis(null);
     
     try {
-      console.log('=== 현재 사용 중인 프롬프트 ===');
-      console.log(prompt);
-
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60초 타임아웃
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
 
       const response = await fetch(`${API_URL}/api/analyze`, {
         method: 'POST',
@@ -244,8 +241,6 @@ function GrammarAnalysis() {
       }
       
       const data = await response.json();
-      console.log('=== 서버 응답 데이터 ===');
-      console.log(data);
       
       if (data.error) {
         throw new Error(data.error);
@@ -253,7 +248,6 @@ function GrammarAnalysis() {
       
       setAnalysis(data);
     } catch (error) {
-      console.error('Error:', error);
       if (error.name === 'AbortError') {
         alert('분석 시간이 너무 오래 걸립니다. 다시 시도해주세요.');
       } else {
