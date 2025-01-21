@@ -50,52 +50,75 @@ app.post('/api/analyze', async (req, res) => {
   try {
     const { text, prompt } = req.body;
     
-    console.log('=== 분석 요청 시작 ===');
-    console.log('입력 텍스트:', text);
-    
     if (!text) {
       return res.status(400).json({ error: 'Text is required' });
     }
 
-    // OpenAI API 호출을 재시도 로직으로 감싸기
-    const completion = await retryOperation(async () => {
-      const response = await openai.chat.completions.create({
-        model: "gpt-4",
-        messages: [
-          {
-            role: "system",
-            content: "You are a helpful English grammar teacher who provides detailed analysis of English sentences in Korean."
-          },
-          {
-            role: "user",
-            content: prompt + '\n\n[입력값]\n' + text
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 2000,  // 토큰 제한 추가
-        timeout: 30000     // 30초 타임아웃
-      });
-      return response;
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [
+        {
+          role: "system",
+          content: "You are a helpful English grammar teacher who provides detailed analysis of English sentences in Korean. Always respond in valid JSON format."
+        },
+        {
+          role: "user",
+          content: prompt + '\n\n[입력값]\n' + text
+        }
+      ],
+      temperature: 0.7,
+      presence_penalty: 0.1,
+      frequency_penalty: 0.1,
+      max_tokens: 2000,
+      timeout: 60000
     });
 
     const response = completion.choices[0].message.content;
     
     try {
-      const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
-      return res.json(Array.isArray(parsedResponse) ? parsedResponse : [parsedResponse]);
+      // JSON 파싱 전에 응답 검증
+      if (!response || typeof response !== 'string') {
+        throw new Error('Invalid response from OpenAI');
+      }
+
+      // 응답에서 JSON 부분만 추출
+      const jsonMatch = response.match(/\[[\s\S]*\]/);
+      if (!jsonMatch) {
+        throw new Error('No JSON array found in response');
+      }
+
+      const parsedResponse = JSON.parse(jsonMatch[0]);
+      
+      if (!Array.isArray(parsedResponse)) {
+        throw new Error('Response is not an array');
+      }
+
+      return res.json(parsedResponse);
     } catch (parseError) {
       console.error('파싱 에러:', parseError);
-      throw new Error('응답 파싱 실패: ' + parseError.message);
+      console.error('원본 응답:', response);
+      
+      // 응답 형식이 잘못된 경우 기본 형식으로 변환
+      const fallbackResponse = [{
+        "Sentence": text,
+        "translation": "번역 실패",
+        "explanation": ["구문 분석 중 오류가 발생했습니다. 다시 시도해주세요."]
+      }];
+      
+      return res.json(fallbackResponse);
     }
   } catch (error) {
     console.error('=== 에러 발생 ===');
-    console.error('에러 타입:', error.constructor.name);
     console.error('에러 메시지:', error.message);
     
-    return res.status(500).json({
-      error: '분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
-      details: error.message
-    });
+    // 사용자에게 친숙한 에러 메시지 반환
+    const userFriendlyResponse = [{
+      "Sentence": text,
+      "translation": "분석 실패",
+      "explanation": ["서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요."]
+    }];
+    
+    return res.json(userFriendlyResponse);
   }
 });
 
