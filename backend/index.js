@@ -3,34 +3,31 @@ import cors from 'cors';
 import { OpenAI } from 'openai';
 import dotenv from 'dotenv';
 
-try {
-  dotenv.config();
-} catch (error) {
-  console.log('No .env file found');
-}
+dotenv.config();
 
 const app = express();
 
-// CORS 설정
-const corsOptions = {
-  origin: '*',
+// CORS 설정 업데이트
+app.use(cors({
+  origin: ['https://english-analysis-web.onrender.com', 'http://localhost:3000'],
   methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type']
-};
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 
-app.use(cors(corsOptions));
-app.use(express.json());
+// preflight 요청을 위한 OPTIONS 핸들러
+app.options('*', cors());
+
+app.use(express.json({ limit: '10mb' }));
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// 기본 상태 체크 엔드포인트
 app.get('/', (req, res) => {
-  res.json({ 
-    status: 'Server is running',
-    environment: process.env.NODE_ENV,
-    apiKeyExists: !!process.env.OPENAI_API_KEY
-  });
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.json({ status: 'Server is running' });
 });
 
 // 재시도 함수 추가
@@ -47,6 +44,12 @@ const retryOperation = async (operation, maxAttempts = 3, delay = 2000) => {
 };
 
 app.post('/api/analyze', async (req, res) => {
+  // CORS 헤더 직접 설정
+  res.setHeader('Access-Control-Allow-Origin', 'https://english-analysis-web.onrender.com');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
   try {
     const { text, prompt } = req.body;
     
@@ -111,19 +114,28 @@ app.post('/api/analyze', async (req, res) => {
     console.error('=== 에러 발생 ===');
     console.error('에러 메시지:', error.message);
     
-    // 사용자에게 친숙한 에러 메시지 반환
-    const userFriendlyResponse = [{
-      "Sentence": text,
+    res.status(200).json([{
+      "Sentence": req.body.text || "",
       "translation": "분석 실패",
       "explanation": ["서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요."]
-    }];
-    
-    return res.json(userFriendlyResponse);
+    }]);
   }
 });
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
+
+// 서버 시작 시 에러 처리
+const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  console.log('Environment:', process.env.NODE_ENV);
+}).on('error', (err) => {
+  console.error('Server failed to start:', err);
+});
+
+// 예기치 않은 에러 처리
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
 });
