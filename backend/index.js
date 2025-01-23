@@ -71,7 +71,7 @@ app.post('/api/analyze', async (req, res) => {
         }
       ],
       temperature: 0.7,
-      max_tokens: 5500,
+      max_tokens: 2500,
       presence_penalty: 0.1,
       frequency_penalty: 0.1
     });
