@@ -150,18 +150,6 @@ const defaultPrompt = `###
  
  
 1. 접속사, 관계사, 동격
-다음은 사용자가 입력한 영어 문단입니다. 문단을 분석하고, 학습자를 위한 구문 풀이와 번역을 포함한 결과물을 아래의 형식에 맞게 작성하세요.**문장별 주요 문법 포인트를 항목화하여 구체적으로 설명합니다.**
- 
-분석 예시) 
-①help+(to) 동사원형: ‘~하는 것을 돕다’라는 뜻으로 help 뒤에 동사원형 make가 쓰였다.
-②수일치: 주어의 핵심은 복수명사 acts이므로 수일치한 복수동사 help가 쓰였다.
-③make+O+O·C(형용사/명사): ‘~를 ...하게/~로 만들다‘라는 뜻으로 두 개의 목적어 our lives와 our world가 접속사 and로 연결되어 목적격보어로 비교급 형용사 happier와 명사구 a better place가 각각 쓰였다.
-④목적격 관계대명사: that은 동사 win의 목적어가 없는 불완전한 절(one ~ survive)을 이끌어 a series of competitions를 선행사로 수식하는 관계사절을 이루는 목적격 관계대명사이며, which로 바꾸어 쓰거나 생략할 수 있다. 
-⑤in order to+동사원형: ‘~하기 위해‘라는 뜻으로 ’so as to+동사원형’으로 바꾸어 쓰거나 부사적용법의 to부정사로도 쓸 수 있다.= so as to survive = to survive
-⑥Other+복수 가산명사: ‘다른 ~들’의 의미를 가지며, other 뒤에는 가산명사의 복수형 또는 불가산 명사가 온다. cf) another+단수명사
- 
- 
-1. 접속사, 관계사, 동격
 접속사 that: 명사절을 이끌며 생략 가능.
 관계대명사 that: 사람/사물을 제한적으로 수식하며 주격, 목적격으로 사용.
 동격의 that: 앞 명사를 부연 설명.
@@ -172,6 +160,7 @@ const defaultPrompt = `###
 등위 접속사: and, but, or, so는 단어나 구, 절을 병렬 연결함.
 종속 접속사: 시간(when, while), 이유(because, since), 조건(if, unless) 등의 부사절을 이끎.
 접속사는 분사구문으로 변환 시 생략 가능 (After he finished → Having finished).
+
 2. 관계사와 복합 관계사
 관계대명사(접속사+대명사역할): who, which, that은 주격/목적격으로 사용, whose는 소유를 나타냄.
 관계부사(접속사+부사역할):when, where, how, why, how는 선행사와 함께 쓸 수 없음
@@ -179,6 +168,7 @@ const defaultPrompt = `###
 복합 관계부사: wherever, whenever, however는 부사절을 이끎.
 관계대명사절: 불완전한 절을 이끌며 문맥에 따라 사용.
 복합 관계사는 명사절과 부사절에서 모두 사용 가능.
+
 3. 동사 구문 패턴
 목적어 + to부정사: allow, expect, want, require.
 목적어 + 동사원형: let, make, have, see, hear.
@@ -209,54 +199,63 @@ stop: ~하기 위해 멈추다(to부정사) / ~하는 것을 멈추다(동명사
 부사적 용법: 목적, 결과, 원인, 판단 근거를 나타냄.
 to부정사는 다양한 문법적 역할을 수행함.
 명사적/형용사적/부사적 용법 구분 필수.
+
 5. 시제와 태
 현재완료: 완료, 경험, 계속, 결과를 나타냄.
 수동태: 일반 수동(be + p.p.), 진행 수동(be being + p.p.), 완료 수동(have been + p.p.).
 현재분사: 능동/진행 의미, 과거분사: 수동/완료 의미.
 분사는 형용사처럼 사용되며 문맥에 따라 적절히 활용.
 시제와 태는 문법적 정확성을 유지하기 위해 중요.
+
 6. 가정법
 가정법 과거: If + 과거, would + 동사원형.
 가정법 과거완료: If + had + p.p., would have + p.p..
 혼합 가정법: If + had + p.p., would + 동사원형.
 가정법은 가정 상황과 시제 표현에 따라 구분됨.
 과거와 현재를 혼합 표현할 때 혼합 가정법 사용.
+
 7. 특수 구문
 강조 구문: It is ~ that.
 도치 구문: 부정어구 + 조동사/be + 주어.
 생략 구문: 문맥상 생략 가능한 표현 사용 (Though possible).
 동격 구문: 앞 명사를 부연 설명 (This book, that is, his diary).
 특수 구문은 문장의 강조나 변화를 위해 사용됨.
+
 8. 수 일치
 The number of + 복수명사 → 단수동사.
 A number of + 복수명사 → 복수동사.
 Either A or B → B에 동사 일치.
 수일치는 주어와 동사의 관계를 정확히 맞추는 데 중요.
 복수와 단수 표현을 구분해야 함.
+
 9. 조동사의 의미
 must have + p.p.: 강한 과거 추측.
 may/might have + p.p.: 불확실한 과거 추측.
 should have + p.p.: 과거에 대한 후회/비난.
 조동사는 시제와 의미를 명확히 전달하는 데 필수.
 추측과 후회 표현에서 자주 사용됨.
+
 10. 주요 동사 구분
 지각동사: 원형(I saw him leave.), 현재분사(I saw him leaving.).
 사역동사: 원형(I made him clean.), 과거분사(I made it cleaned.).
 used to: 과거의 습관, be used to: ~에 익숙함.
 지각/사역 동사는 보어의 형태에 따라 의미가 달라짐.
 used to와 be used to는 문맥에 맞게 사용.
+
 11. 분사 구문
 일반 분사구문: 동시 동작(Watching TV, I ate snacks.), 부대 상황(He came home, bringing a gift.).
 분사 구문 시제: 현재분사(능동/동시), 완료분사(이전 동작), 수동분사(수동 의미).
 독립 분사구문: 주어가 독립된 분사 표현 (Weather permitting, we will go).
 분사 형태는 문맥과 시제에 맞게 선택해야 함.
 문장의 의미와 흐름에 따라 분사구문 활용.
+
 12. 전치사
 주요 전치사: 이유/원인(because of, due to), 수단/도구(by, with, through).
 방향/위치(to, into, onto), 대조(despite, instead of), 목적/조건(for the sake of, in order to).
 관계 전치사: about, of, for.
 자주 쓰이는 전치사: as (~로서), like (~처럼), except (~을 제외하고).
 전치사와 접속사 구별: 전치사(뒤에 명사/동명사), 접속사(뒤에 주어+동사).
+
 13. 대명사
 인칭 대명사: 주격(I), 목적격(me), 소유격(my), 소유대명사(mine).
 지시 대명사: this, that, these, those.
