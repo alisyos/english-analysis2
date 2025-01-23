@@ -70,10 +70,10 @@ app.post('/api/analyze', async (req, res) => {
           content: prompt + '\n\n[입력값]\n' + processedText
         }
       ],
-      temperature: 1.0,
-      max_tokens: 4500,
-      presence_penalty: 0.0,
-      frequency_penalty: 0.0
+      temperature: 0.7,
+      max_tokens: 5500,
+      presence_penalty: 0.1,
+      frequency_penalty: 0.1
     });
 
     const response = completion.choices[0].message.content;
