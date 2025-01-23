@@ -55,56 +55,56 @@ app.post('/api/analyze', async (req, res) => {
       }]);
     }
 
-    // 문장 시작 부분이 불완전한 경우 'In' 추가
-    const processedText = text.trim().startsWith('order') ? 'In ' + text : text;
-
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4",
       messages: [
         {
           role: "system",
-          content: "You are a helpful English grammar teacher who provides detailed analysis of English sentences in Korean. Always respond in valid JSON format with proper sentence analysis."
+          content: "You are a helpful English grammar teacher who provides detailed analysis of English sentences in Korean. Always respond in valid JSON format."
         },
         {
           role: "user",
-          content: prompt + '\n\n[입력값]\n' + processedText
+          content: prompt + '\n\n[입력값]\n' + text
         }
       ],
-      temperature: 1.0,
-      max_tokens: 4500,
-      presence_penalty: 0.0,
-      frequency_penalty: 0.0
+      temperature: 0.7,
+      max_tokens: 2500
     });
 
-    const response = completion.choices[0].message.content;
+    let response = completion.choices[0].message.content;
     
+    // JSON 형식 검증 및 변환
     try {
+      // 응답에서 JSON 부분만 추출
+      const jsonMatch = response.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        response = jsonMatch[0];
+      }
+      
       const parsedResponse = JSON.parse(response);
       return res.json(Array.isArray(parsedResponse) ? parsedResponse : [parsedResponse]);
     } catch (parseError) {
-      console.error('파싱 에러:', parseError);
+      console.error('JSON 파싱 에러:', parseError);
       // 기본 응답 형식으로 변환
       return res.json([{
-        "Sentence": processedText,
-        "translation": "구문 분석을 진행합니다.",
+        "Sentence": text,
+        "translation": "구문 분석 중입니다",
         "explanation": [
-          "① 전치사 In: 문장 시작 부분에 'In'이 생략되어 있습니다.",
-          "② 구문 분석이 곧 제공됩니다.",
-          "③ 잠시만 기다려주세요."
+          "① 구문 분석이 진행 중입니다",
+          "② 잠시만 기다려주세요",
+          "③ 시스템이 분석을 완료하면 결과가 표시됩니다"
         ]
       }]);
     }
   } catch (error) {
-    console.error('=== 에러 발생 ===');
-    console.error('에러 메시지:', error.message);
-    
-    return res.json([{
+    console.error('API 에러:', error);
+    return res.status(500).json([{
       "Sentence": text || "",
-      "translation": "분석 처리 중 오류",
+      "translation": "서버 오류",
       "explanation": [
-        "① 일시적인 서버 부하가 발생했습니다.",
-        "② 잠시 후 다시 시도해주세요.",
-        "③ 문제가 지속되면 관리자에게 문의해주세요."
+        "① 서버 처리 중 오류가 발생했습니다",
+        "② 잠시 후 다시 시도해주세요",
+        "③ 문제가 지속되면 관리자에게 문의해주세요"
       ]
     }]);
   }
