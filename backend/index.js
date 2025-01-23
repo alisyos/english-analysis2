@@ -59,7 +59,7 @@ app.post('/api/analyze', async (req, res) => {
     const processedText = text.trim().startsWith('order') ? 'In ' + text : text;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
@@ -70,10 +70,10 @@ app.post('/api/analyze', async (req, res) => {
           content: prompt + '\n\n[입력값]\n' + processedText
         }
       ],
-      temperature: 0.7,
-      max_tokens: 2500,
-      presence_penalty: 0.1,
-      frequency_penalty: 0.1
+      temperature: 1.0,
+      max_tokens: 4500,
+      presence_penalty: 0.0,
+      frequency_penalty: 0.0
     });
 
     const response = completion.choices[0].message.content;
