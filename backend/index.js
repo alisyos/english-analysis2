@@ -68,7 +68,13 @@ app.post('/api/analyze', async (req, res) => {
         }
       ],
       temperature: 0.7,
+<<<<<<< HEAD
       max_tokens: 2500
+=======
+      max_tokens: 2500,
+      presence_penalty: 0.1,
+      frequency_penalty: 0.1
+>>>>>>> 4f42b7fdfbe9caf1c3473c881d340c6fcd1aece7
     });
 
     let response = completion.choices[0].message.content;
