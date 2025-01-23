@@ -7,7 +7,6 @@ dotenv.config();
 
 const app = express();
 
-// CORS 설정 업데이트
 app.use(cors({
   origin: ['https://english-analysis-web.onrender.com', 'http://localhost:3000'],
   methods: ['GET', 'POST', 'OPTIONS'],
@@ -15,33 +14,15 @@ app.use(cors({
   credentials: true
 }));
 
-// preflight 요청을 위한 OPTIONS 핸들러
-app.options('*', cors());
-
 app.use(express.json({ limit: '10mb' }));
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// 기본 상태 체크 엔드포인트
 app.get('/', (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
   res.json({ status: 'Server is running' });
 });
-
-// 재시도 함수 추가
-const retryOperation = async (operation, maxAttempts = 3, delay = 2000) => {
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    try {
-      return await operation();
-    } catch (error) {
-      if (attempt === maxAttempts) throw error;
-      console.log(`Attempt ${attempt} failed, retrying in ${delay}ms...`);
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-  }
-};
 
 app.post('/api/analyze', async (req, res) => {
   try {
@@ -68,20 +49,12 @@ app.post('/api/analyze', async (req, res) => {
         }
       ],
       temperature: 0.7,
-<<<<<<< HEAD
       max_tokens: 2500
-=======
-      max_tokens: 2500,
-      presence_penalty: 0.1,
-      frequency_penalty: 0.1
->>>>>>> 4f42b7fdfbe9caf1c3473c881d340c6fcd1aece7
     });
 
     let response = completion.choices[0].message.content;
     
-    // JSON 형식 검증 및 변환
     try {
-      // 응답에서 JSON 부분만 추출
       const jsonMatch = response.match(/\[[\s\S]*\]/);
       if (jsonMatch) {
         response = jsonMatch[0];
@@ -91,7 +64,6 @@ app.post('/api/analyze', async (req, res) => {
       return res.json(Array.isArray(parsedResponse) ? parsedResponse : [parsedResponse]);
     } catch (parseError) {
       console.error('JSON 파싱 에러:', parseError);
-      // 기본 응답 형식으로 변환
       return res.json([{
         "Sentence": text,
         "translation": "구문 분석 중입니다",
@@ -118,18 +90,18 @@ app.post('/api/analyze', async (req, res) => {
 
 const PORT = process.env.PORT || 3001;
 
-// 서버 시작 시 에러 처리
 const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 }).on('error', (err) => {
   console.error('Server failed to start:', err);
+  process.exit(1);
 });
 
-// 예기치 않은 에러 처리
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
 process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error);
+  process.exit(1);
 });
