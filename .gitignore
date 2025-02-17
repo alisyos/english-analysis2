@@ -1,21 +1,4 @@
-# dependencies
-/node_modules
-/backend/node_modules
-
-# environment variables
+﻿node_modules/
 .env
-/backend/.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# production
-/build
-
-# misc
+build/
 .DS_Store
-.vscode
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*

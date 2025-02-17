@@ -20,13 +20,16 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// Assistant ID를 환경 변수에서 가져옴
+const ASSISTANT_ID = process.env.ASSISTANT_ID || "asst_uYM0ik8xa8QiiJscSod3c42j";
+
 app.get('/', (req, res) => {
   res.json({ status: 'Server is running' });
 });
 
 app.post('/api/analyze', async (req, res) => {
   try {
-    const { text, prompt } = req.body;
+    const { text } = req.body;
     
     if (!text) {
       return res.status(400).json([{
@@ -36,32 +39,51 @@ app.post('/api/analyze', async (req, res) => {
       }]);
     }
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: "You are a helpful English grammar teacher who provides detailed analysis of English sentences in Korean. Always respond in valid JSON format."
-        },
-        {
-          role: "user",
-          content: prompt + '\n\n[입력값]\n' + text
-        }
-      ],
-      temperature: 0.7,
-      max_tokens: 2500
+    // Thread 생성
+    const thread = await openai.beta.threads.create();
+
+    // 메시지 추가
+    await openai.beta.threads.messages.create(thread.id, {
+      role: "user",
+      content: text
     });
 
-    let response = completion.choices[0].message.content;
-    
+    // Assistant로 실행
+    const run = await openai.beta.threads.runs.create(thread.id, {
+      assistant_id: ASSISTANT_ID,
+    });
+
+    // 실행 완료 대기
+    let runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+    while (runStatus.status !== 'completed') {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+      
+      if (runStatus.status === 'failed') {
+        throw new Error('Assistant run failed');
+      }
+    }
+
+    // 응답 메시지 가져오기
+    const messages = await openai.beta.threads.messages.list(thread.id);
+    const response = messages.data[0].content[0].text.value;
+
     try {
       const jsonMatch = response.match(/\[[\s\S]*\]/);
       if (jsonMatch) {
-        response = jsonMatch[0];
+        const parsedResponse = JSON.parse(jsonMatch[0]);
+        return res.json(Array.isArray(parsedResponse) ? parsedResponse : [parsedResponse]);
       }
       
-      const parsedResponse = JSON.parse(response);
-      return res.json(Array.isArray(parsedResponse) ? parsedResponse : [parsedResponse]);
+      return res.json([{
+        "Sentence": text,
+        "translation": "구문 분석 중입니다",
+        "explanation": [
+          "① 구문 분석이 진행 중입니다",
+          "② 잠시만 기다려주세요",
+          "③ 시스템이 분석을 완료하면 결과가 표시됩니다"
+        ]
+      }]);
     } catch (parseError) {
       console.error('JSON 파싱 에러:', parseError);
       return res.json([{
@@ -77,13 +99,9 @@ app.post('/api/analyze', async (req, res) => {
   } catch (error) {
     console.error('API 에러:', error);
     return res.status(500).json([{
-      "Sentence": text || "",
+      "Sentence": "",
       "translation": "서버 오류",
-      "explanation": [
-        "① 서버 처리 중 오류가 발생했습니다",
-        "② 잠시 후 다시 시도해주세요",
-        "③ 문제가 지속되면 관리자에게 문의해주세요"
-      ]
+      "explanation": [`오류가 발생했습니다: ${error.message}`]
     }]);
   }
 });
