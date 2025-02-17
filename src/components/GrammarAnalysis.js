@@ -137,9 +137,7 @@ const PromptEditor = styled.textarea`
   }
 `;
 
-const API_URL = process.env.NODE_ENV === 'production'
-  ? 'https://english-analysis.onrender.com'
-  : 'http://localhost:3001';
+const API_URL = 'https://english-analysis2.onrender.com';
 
 function GrammarAnalysis() {
   const [text, setText] = useState('');
